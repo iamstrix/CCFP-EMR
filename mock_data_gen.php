@@ -29,62 +29,70 @@ $addresses = [
 $illnessPathways = [
     [
         'condition' => 'Recurrent Common Cold & Flu',
+        'chief_complaint' => 'Cough',
+        'diagnosis' => 'Common Cold',
         'stages' => [
-            ['symp' => 'Sneezing, runny nose, mild throat itchiness', 'treat' => 'Prescribed Cetirizine 10mg OD. Vitamin C 500mg. Drink plenty of water.', 'rem' => 'Likely viral upper respiratory infection. Rest advised.'],
-            ['symp' => 'Slight dry cough, no fever', 'treat' => 'Continue Vitamin C. Added Ambroxol 30mg TID for cough.', 'rem' => 'Patient feels slightly better.'],
-            ['symp' => 'No symptoms. Routine vitamin refill', 'treat' => 'Refilled Multivitamins.', 'rem' => 'Recovery complete.'],
-            ['symp' => 'Recurrence of symptoms after rainy travel: Feverish, sore throat', 'treat' => 'Paracetamol 500mg PRN. Gargle with warm salt water.', 'rem' => 'New episode of viral flu.'],
-            ['symp' => 'Productive cough, yellowish phlegm', 'treat' => 'Amoxicillin 500mg TID for 7 days. Continue hydration.', 'rem' => 'Suspected mild secondary bacterial infection.'],
-            ['symp' => 'Cough improving, still feels weak', 'treat' => 'Continue Antibiotics. Rest.', 'rem' => 'Compliance is good.'],
-            ['symp' => 'Resolved. Throat clear.', 'treat' => 'Vitamins only.', 'rem' => 'Back to healthy baseline.'],
-            ['symp' => 'Minor nasal congestion due to allergens', 'treat' => 'Loratadine 10mg OD.', 'rem' => 'Seasonal allergy management.'],
-            ['symp' => 'Stable. Feeling well.', 'treat' => 'None.', 'rem' => 'Fully asymptomatic.'],
-            ['symp' => 'Routine visit. Clean bill of health.', 'treat' => 'Stay hydrated.', 'rem' => 'Patient educated on flu prevention.']
+            ['det' => 'Sneezing, runny nose, mild throat itchiness', 'treat' => 'Prescribed Cetirizine 10mg OD. Vitamin C 500mg. Drink plenty of water.', 'rem' => 'Likely viral upper respiratory infection. Rest advised.'],
+            ['det' => 'Slight dry cough, no fever', 'treat' => 'Continue Vitamin C. Added Ambroxol 30mg TID for cough.', 'rem' => 'Patient feels slightly better.'],
+            ['det' => 'No symptoms. Routine vitamin refill', 'treat' => 'Refilled Multivitamins.', 'rem' => 'Recovery complete.'],
+            ['det' => 'Recurrence of symptoms after rainy travel: Feverish, sore throat', 'treat' => 'Paracetamol 500mg PRN. Gargle with warm salt water.', 'rem' => 'New episode of viral flu.'],
+            ['det' => 'Productive cough, yellowish phlegm', 'treat' => 'Amoxicillin 500mg TID for 7 days. Continue hydration.', 'rem' => 'Suspected mild secondary bacterial infection.'],
+            ['det' => 'Cough improving, still feels weak', 'treat' => 'Continue Antibiotics. Rest.', 'rem' => 'Compliance is good.'],
+            ['det' => 'Resolved. Throat clear.', 'treat' => 'Vitamins only.', 'rem' => 'Back to healthy baseline.'],
+            ['det' => 'Minor nasal congestion due to allergens', 'treat' => 'Loratadine 10mg OD.', 'rem' => 'Seasonal allergy management.'],
+            ['det' => 'Stable. Feeling well.', 'treat' => 'None.', 'rem' => 'Fully asymptomatic.'],
+            ['det' => 'Routine visit. Clean bill of health.', 'treat' => 'Stay hydrated.', 'rem' => 'Patient educated on flu prevention.']
         ]
     ],
     [
         'condition' => 'Chronic Hypertension (Stable)',
+        'chief_complaint' => 'Dizziness',
+        'diagnosis' => 'Hypertension',
         'stages' => [
-            ['symp' => 'BP 150/90. Occasional nape pain after salty meals.', 'treat' => 'Amlodipine 5mg OD. Advised low-salt, low-fat diet.', 'rem' => 'Stage 1 Hypertension. OPD monitoring.'],
-            ['symp' => 'BP 140/85. Nape pain reduced.', 'treat' => 'Continue Amlodipine. Provided diet chart.', 'rem' => 'Stabilizing. Patient compliant.'],
-            ['symp' => 'BP 130/80. No complaints.', 'treat' => 'Maintain current meds.', 'rem' => 'Excellent BP control.'],
-            ['symp' => 'BP 145/90. Reported eating at a fiesta.', 'treat' => 'Counseling on diet during holidays. Maintain meds.', 'rem' => 'Lifestyle-induced BP spike.'],
-            ['symp' => 'BP 135/85. Feeling better.', 'treat' => 'Continue Amlodipine.', 'rem' => 'Return to baseline.'],
-            ['symp' => 'BP 125/80. No dizziness.', 'treat' => 'Prescription refill for 2 months.', 'rem' => 'Stable maintenance.'],
-            ['symp' => 'BP 120/80. Weight down by 1kg.', 'treat' => 'Encouraged walking 30 mins daily.', 'rem' => 'Good progress with exercise.'],
-            ['symp' => 'BP 128/82. Routine checkup.', 'treat' => 'None.', 'rem' => 'Still within target range.'],
-            ['symp' => 'BP 130/80. Refill request.', 'treat' => 'Amlodipine refilled.', 'rem' => 'Maintenance check.'],
-            ['symp' => 'BP 120/80. No signs of retinopathy or edema.', 'treat' => 'Continue current plan.', 'rem' => 'Maintenance is effective.']
+            ['det' => 'BP 150/90. Occasional nape pain after salty meals.', 'treat' => 'Amlodipine 5mg OD. Advised low-salt, low-fat diet.', 'rem' => 'Stage 1 Hypertension. OPD monitoring.'],
+            ['det' => 'BP 140/85. Nape pain reduced.', 'treat' => 'Continue Amlodipine. Provided diet chart.', 'rem' => 'Stabilizing. Patient compliant.'],
+            ['det' => 'BP 130/80. No complaints.', 'treat' => 'Maintain current meds.', 'rem' => 'Excellent BP control.'],
+            ['det' => 'BP 145/90. Reported eating at a fiesta.', 'treat' => 'Counseling on diet during holidays. Maintain meds.', 'rem' => 'Lifestyle-induced BP spike.'],
+            ['det' => 'BP 135/85. Feeling better.', 'treat' => 'Continue Amlodipine.', 'rem' => 'Return to baseline.'],
+            ['det' => 'BP 125/80. No dizziness.', 'treat' => 'Prescription refill for 2 months.', 'rem' => 'Stable maintenance.'],
+            ['det' => 'BP 120/80. Weight down by 1kg.', 'treat' => 'Encouraged walking 30 mins daily.', 'rem' => 'Good progress with exercise.'],
+            ['det' => 'BP 128/82. Routine checkup.', 'treat' => 'None.', 'rem' => 'Still within target range.'],
+            ['det' => 'BP 130/80. Refill request.', 'treat' => 'Amlodipine refilled.', 'rem' => 'Maintenance check.'],
+            ['det' => 'BP 120/80. No signs of retinopathy or edema.', 'treat' => 'Continue current plan.', 'rem' => 'Maintenance is effective.']
         ]
     ],
     [
         'condition' => 'Skin Infection (Tinea / Ringworm)',
+        'chief_complaint' => 'Skin Rash',
+        'diagnosis' => 'Skin Infection (Tinea)',
         'stages' => [
-            ['symp' => 'Itchy, red circular rashes on the back/arms.', 'treat' => 'Clotrimazole Cream BID. Advised keeping area dry.', 'rem' => 'Fungal skin infection. Non-infectious to others via touch.'],
-            ['symp' => 'Itching significantly reduced. Redness fading.', 'treat' => 'Continue Cream for 7 more days. Do not scratch.', 'rem' => 'Partial resolution.'],
-            ['symp' => 'Rashes almost gone. Hypopigmented spots left.', 'treat' => 'Continue topical.', 'rem' => 'Healing.'],
-            ['symp' => 'Skin cleared. Occasional itch when sweating.', 'treat' => 'Miconazole powder for shoes/socks.', 'rem' => 'Full recovery. Prevention advised.'],
-            ['symp' => 'Stable skin.', 'treat' => 'None.', 'rem' => 'No active lesions.'],
-            ['symp' => 'Minor recurrence due to gym use/sweating.', 'treat' => 'Resume Clotrimazole Cream.', 'rem' => 'Reinforced hygiene counseling.'],
-            ['symp' => 'Cleared again.', 'treat' => 'None.', 'rem' => 'Successful re-treatment.'],
-            ['symp' => 'Follow up. No new lesions.', 'treat' => 'None.', 'rem' => 'Clear.'],
-            ['symp' => 'Routine checkup.', 'treat' => 'None.', 'rem' => 'Stable.'],
-            ['symp' => 'Healthy skin.', 'treat' => 'None.', 'rem' => 'Discharged from skin monitoring.']
+            ['det' => 'Itchy, red circular rashes on the back/arms.', 'treat' => 'Clotrimazole Cream BID. Advised keeping area dry.', 'rem' => 'Fungal skin infection. Non-infectious to others via touch.'],
+            ['det' => 'Itching significantly reduced. Redness fading.', 'treat' => 'Continue Cream for 7 more days. Do not scratch.', 'rem' => 'Partial resolution.'],
+            ['det' => 'Rashes almost gone. Hypopigmented spots left.', 'treat' => 'Continue topical.', 'rem' => 'Healing.'],
+            ['det' => 'Skin cleared. Occasional itch when sweating.', 'treat' => 'Miconazole powder for shoes/socks.', 'rem' => 'Full recovery. Prevention advised.'],
+            ['det' => 'Stable skin.', 'treat' => 'None.', 'rem' => 'No active lesions.'],
+            ['det' => 'Minor recurrence due to gym use/sweating.', 'treat' => 'Resume Clotrimazole Cream.', 'rem' => 'Reinforced hygiene counseling.'],
+            ['det' => 'Cleared again.', 'treat' => 'None.', 'rem' => 'Successful re-treatment.'],
+            ['det' => 'Follow up. No new lesions.', 'treat' => 'None.', 'rem' => 'Clear.'],
+            ['det' => 'Routine checkup.', 'treat' => 'None.', 'rem' => 'Stable.'],
+            ['det' => 'Healthy skin.', 'treat' => 'None.', 'rem' => 'Discharged from skin monitoring.']
         ]
     ],
     [
         'condition' => 'Mild Gastritis / Acid Reflux',
+        'chief_complaint' => 'Stomach ache',
+        'diagnosis' => 'Acid Reflux (GERD)',
         'stages' => [
-            ['symp' => 'Burning sensation in the chest, sour taste in mouth.', 'treat' => 'Omeprazole 20mg OD (30 mins before breakfast). Avoid coffee/spicy food.', 'rem' => 'Suspected Acid Reflux (GERD).'],
-            ['symp' => 'Feeling better. Reflux only happens when lying down after dinner.', 'treat' => 'Maintain Omeprazole. Advised not to lie down for 2 hrs after eating.', 'rem' => 'Lifestyle adjustment required.'],
-            ['symp' => 'Stable. No heartburn.', 'treat' => 'Tapering Omeprazole to PRN.', 'rem' => 'Improving.'],
-            ['symp' => 'Mild bloating after eating gata dishes.', 'treat' => 'Simethicone PRN. Continue diet avoidance.', 'rem' => 'Dietary flare-up.'],
-            ['symp' => 'Bloating resolved.', 'treat' => 'Stay on bland diet for 3 days.', 'rem' => 'Managed.'],
-            ['symp' => 'Feeling normal. No antacids needed for a week.', 'treat' => 'None.', 'rem' => 'Stable.'],
-            ['symp' => 'Stable.', 'treat' => 'None.', 'rem' => 'Checkup.'],
-            ['symp' => 'Occasional stress-induced stomach ache.', 'treat' => 'Warm water, relaxation.', 'rem' => 'Psychosomatic factor.'],
-            ['symp' => 'No symptoms.', 'treat' => 'None.', 'rem' => 'Asymptomatic.'],
-            ['symp' => 'Full recovery. Patient learned dietary triggers.', 'treat' => 'None.', 'rem' => 'Case closed.']
+            ['det' => 'Burning sensation in the chest, sour taste in mouth.', 'treat' => 'Omeprazole 20mg OD (30 mins before breakfast). Avoid coffee/spicy food.', 'rem' => 'Suspected Acid Reflux (GERD).'],
+            ['det' => 'Feeling better. Reflux only happens when lying down after dinner.', 'treat' => 'Maintain Omeprazole. Advised not to lie down for 2 hrs after eating.', 'rem' => 'Lifestyle adjustment required.'],
+            ['det' => 'Stable. No heartburn.', 'treat' => 'Tapering Omeprazole to PRN.', 'rem' => 'Improving.'],
+            ['det' => 'Mild bloating after eating gata dishes.', 'treat' => 'Simethicone PRN. Continue diet avoidance.', 'rem' => 'Dietary flare-up.'],
+            ['det' => 'Bloating resolved.', 'treat' => 'Stay on bland diet for 3 days.', 'rem' => 'Managed.'],
+            ['det' => 'Feeling normal. No antacids needed for a week.', 'treat' => 'None.', 'rem' => 'Stable.'],
+            ['det' => 'Stable.', 'treat' => 'None.', 'rem' => 'Checkup.'],
+            ['det' => 'Occasional stress-induced stomach ache.', 'treat' => 'Warm water, relaxation.', 'rem' => 'Psychosomatic factor.'],
+            ['det' => 'No symptoms.', 'treat' => 'None.', 'rem' => 'Asymptomatic.'],
+            ['det' => 'Full recovery. Patient learned dietary triggers.', 'treat' => 'None.', 'rem' => 'Case closed.']
         ]
     ]
 ];
@@ -163,25 +171,27 @@ foreach ($patientsData as $p) {
         if ($stageIdx >= $stagesCount) $stageIdx = $stagesCount - 1;
         $stage = $pathway['stages'][$stageIdx];
         
-        $symp = addslashes($stage['symp']);
+        $chiefComp = addslashes($pathway['chief_complaint']);
+        $diagnosis = addslashes($pathway['diagnosis']);
+        $det = addslashes($stage['det']);
         $treat = addslashes($stage['treat']);
         $rem = addslashes($stage['rem']);
         
         if (($index % 2) != 0) {
-            $symp = "Follow-up visit. " . $symp;
+            $det = "Follow-up visit. " . $det;
             $rem = "Continuous tracking. " . $rem;
         }
 
         $physId = rand(1, 3);
         $consultationValues[] = sprintf(
-            "(%d, '%s', '%s', '%s', '%s', %d)",
-            $p['id'], $dateStr, $symp, $treat, $rem, $physId
+            "(%d, '%s', '%s', '%s', '%s', '%s', '%s', %d)",
+            $p['id'], $dateStr, $chiefComp, $det, $diagnosis, $treat, $rem, $physId
         );
     }
     
     $chunks = array_chunk($consultationValues, 10);
     foreach ($chunks as $chunk) {
-        $sql .= "INSERT INTO consultation (patient_id, visit_date, symptoms_diagnosis, treatment, remarks, physician_id) VALUES\n";
+        $sql .= "INSERT INTO consultation (patient_id, visit_date, chief_complaint, complaint_details, diagnosis, treatment, remarks, physician_id) VALUES\n";
         $sql .= implode(",\n", $chunk) . ";\n";
     }
 }

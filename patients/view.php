@@ -20,7 +20,7 @@ if (!$patient) { header('Location: list.php'); exit; }
 
 // Consultation history
 $history = $pdo->prepare(
-    "SELECT c.consultation_id, c.visit_date, c.symptoms_diagnosis,
+    "SELECT c.consultation_id, c.visit_date, c.chief_complaint, c.diagnosis,
             c.treatment, c.remarks,
             CONCAT(ph.last_name,', ',ph.first_name) AS physician
      FROM consultation c
@@ -103,7 +103,8 @@ require_once ROOT . '/includes/header.php';
       <thead>
         <tr>
           <th>Date</th>
-          <th>Symptoms/Diagnosis</th>
+          <th>Chief Complaint</th>
+          <th>Diagnosis</th>
           <th>Treatment</th>
           <th>Remarks</th>
           <th>Attending Physician</th>
@@ -114,7 +115,8 @@ require_once ROOT . '/includes/header.php';
         <?php foreach ($consults as $c): ?>
         <tr>
           <td style="white-space:nowrap;"><?= htmlspecialchars($c['visit_date']) ?></td>
-          <td><?= htmlspecialchars(mb_strimwidth($c['symptoms_diagnosis'] ?? '—', 0, 50, '…')) ?></td>
+          <td><?= htmlspecialchars(mb_strimwidth($c['chief_complaint'] ?? '—', 0, 30, '…')) ?></td>
+          <td><span class="badge badge-blue"><?= htmlspecialchars(mb_strimwidth($c['diagnosis'] ?? '—', 0, 30, '…')) ?></span></td>
           <td><?= htmlspecialchars(mb_strimwidth($c['treatment'] ?? '—', 0, 50, '…')) ?></td>
           <td><?= htmlspecialchars(mb_strimwidth($c['remarks'] ?? '—', 0, 50, '…')) ?></td>
           <td><?= htmlspecialchars($c['physician'] ?? '—') ?></td>

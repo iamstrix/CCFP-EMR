@@ -70,8 +70,18 @@ require_once ROOT . '/includes/header.php';
   <div class="card-title">Clinical Notes</div>
   <div class="form-grid">
     <div class="form-group" style="grid-column:1/-1;">
-      <label>Symptoms / Diagnosis</label>
-      <div><?= nl2br(htmlspecialchars($c['symptoms_diagnosis'])) ?></div>
+      <label>Chief Complaint</label>
+      <div><span class="badge badge-amber"><?= htmlspecialchars($c['chief_complaint']) ?></span></div>
+    </div>
+    <?php if ($c['complaint_details']): ?>
+    <div class="form-group" style="grid-column:1/-1;">
+      <label>Complaint Details</label>
+      <div><?= nl2br(htmlspecialchars($c['complaint_details'])) ?></div>
+    </div>
+    <?php endif; ?>
+    <div class="form-group" style="grid-column:1/-1;">
+      <label>Diagnosis</label>
+      <div><span class="badge badge-blue"><?= htmlspecialchars($c['diagnosis']) ?></span></div>
     </div>
     <?php if ($c['treatment']): ?>
     <div class="form-group" style="grid-column:1/-1;">

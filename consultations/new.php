@@ -23,21 +23,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nullify = fn($v) => ($v === '' ? null : $v);
     
     // Clinical
-    $symptomsDiagnosis = $nullify(trim($_POST['symptoms_diagnosis'] ?? ''));
+    $chiefComplaint   = $nullify(trim($_POST['chief_complaint'] ?? ''));
+    $complaintDetails = $nullify(trim($_POST['complaint_details'] ?? ''));
+    $diagnosis        = $nullify(trim($_POST['diagnosis'] ?? ''));
     $treatment         = $nullify(trim($_POST['treatment']  ?? ''));
     $remarks           = $nullify(trim($_POST['remarks']    ?? ''));
 
     if (!$patId)    $errors[] = 'Please select a patient.';
-    if (!$symptomsDiagnosis) $errors[] = 'Symptoms/Diagnosis is required.';
+    if (!$chiefComplaint) $errors[] = 'Chief Complaint is required.';
+    if (!$diagnosis) $errors[] = 'Diagnosis is required.';
 
     if (empty($errors)) {
         $stmt = $pdo->prepare(
             "INSERT INTO consultation
-               (patient_id, physician_id, visit_date, symptoms_diagnosis, treatment, remarks)
-             VALUES (?, ?, ?, ?, ?, ?)"
+               (patient_id, physician_id, visit_date, chief_complaint, complaint_details, diagnosis, treatment, remarks)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
         );
         $stmt->execute([
-            $patId, $physId, $visitDate, $symptomsDiagnosis, $treatment, $remarks
+            $patId, $physId, $visitDate, $chiefComplaint, $complaintDetails, $diagnosis, $treatment, $remarks
         ]);
         $newId = $pdo->lastInsertId();
         $success = "Encounter saved! <a href='view.php?id=$newId'>View encounter #$newId</a> · <a href='new.php'>New encounter</a>";
@@ -96,9 +99,39 @@ require_once ROOT . '/includes/header.php';
 
       <!-- SECTION: Clinical Details -->
       <div class="form-group" style="grid-column:1/-1;">
-        <label for="symptoms_diagnosis">Symptoms / Diagnosis *</label>
-        <textarea name="symptoms_diagnosis" id="symptoms_diagnosis" rows="3" required
-                  placeholder="e.g. Fever for 3 days, Acute Gastroenteritis"><?= htmlspecialchars($_POST['symptoms_diagnosis'] ?? '') ?></textarea>
+        <label for="chief_complaint">Chief Complaint *</label>
+        <input type="text" name="chief_complaint" id="chief_complaint" list="complaint_tags" required
+               placeholder="e.g. Fever, Cough, Headache" value="<?= htmlspecialchars($_POST['chief_complaint'] ?? '') ?>">
+        <datalist id="complaint_tags">
+          <option value="Fever">
+          <option value="Cough">
+          <option value="Headache">
+          <option value="Stomach ache">
+          <option value="Body pain">
+          <option value="Dizziness">
+          <option value="Skin Rash">
+        </datalist>
+      </div>
+
+      <div class="form-group" style="grid-column:1/-1;">
+        <label for="complaint_details">Complaint Details</label>
+        <input type="text" name="complaint_details" id="complaint_details"
+               placeholder="e.g. Associated with vomiting, 3 days duration" value="<?= htmlspecialchars($_POST['complaint_details'] ?? '') ?>">
+      </div>
+
+      <div class="form-group" style="grid-column:1/-1;">
+        <label for="diagnosis">Diagnosis *</label>
+        <input type="text" name="diagnosis" id="diagnosis" list="diagnosis_tags" required
+               placeholder="e.g. Acute Respiratory Infection, Hypertension" value="<?= htmlspecialchars($_POST['diagnosis'] ?? '') ?>">
+        <datalist id="diagnosis_tags">
+          <option value="Acute Respiratory Infection">
+          <option value="Hypertension">
+          <option value="Common Cold">
+          <option value="Acid Reflux (GERD)">
+          <option value="Skin Infection (Tinea)">
+          <option value="Type 2 Diabetes">
+          <option value="Allergic Rhinitis">
+        </datalist>
       </div>
       
       <div class="form-group" style="grid-column:1/-1;">

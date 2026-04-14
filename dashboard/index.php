@@ -33,10 +33,10 @@ $hhWhere = $visitCond ? "WHERE EXISTS (SELECT 1 FROM consultation c WHERE c.pati
 
 // ── 1. Top diagnoses ──────────────────────────────────────
 $topDx = $pdo->query(
-    "SELECT symptoms_diagnosis AS diagnosis, COUNT(*) AS cnt
+    "SELECT diagnosis, COUNT(*) AS cnt
      FROM consultation
-     WHERE symptoms_diagnosis IS NOT NULL AND symptoms_diagnosis <> '' {$visitCond}
-     GROUP BY symptoms_diagnosis
+     WHERE diagnosis IS NOT NULL AND diagnosis <> '' {$visitCond}
+     GROUP BY diagnosis
      ORDER BY cnt DESC
      LIMIT 10"
 )->fetchAll();

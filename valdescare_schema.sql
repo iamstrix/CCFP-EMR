@@ -89,7 +89,9 @@ CREATE TABLE IF NOT EXISTS consultation (
     consultation_id     INT UNSIGNED NOT NULL AUTO_INCREMENT,
     patient_id          INT UNSIGNED NOT NULL,
     visit_date          DATE         NOT NULL,
-    symptoms_diagnosis  TEXT         NULL DEFAULT NULL,
+    chief_complaint     VARCHAR(150) NULL DEFAULT NULL,
+    complaint_details   TEXT         NULL DEFAULT NULL,
+    diagnosis           VARCHAR(150) NULL DEFAULT NULL,
     treatment           TEXT         NULL DEFAULT NULL,
     remarks             TEXT         NULL DEFAULT NULL,
     physician_id        SMALLINT UNSIGNED NULL DEFAULT NULL,
@@ -145,7 +147,9 @@ SELECT
     p.is_ip,
     p.nhts_status,
     CONCAT(ph.last_name, ', ', ph.first_name) AS physician_name,
-    c.symptoms_diagnosis,
+    c.chief_complaint,
+    c.complaint_details,
+    c.diagnosis,
     c.treatment
 FROM consultation c
 JOIN patient      p   ON c.patient_id    = p.patient_id

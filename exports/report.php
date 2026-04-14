@@ -45,7 +45,8 @@ if ($mode === 'summary') {
                 p.patient_name,
                 TIMESTAMPDIFF(YEAR,p.dob,c.visit_date) AS age, p.sex,
                 p.address AS barangay, p.is_ip, p.nhts_status,
-                c.symptoms_diagnosis,
+                c.chief_complaint,
+                c.diagnosis,
                 CONCAT(ph.last_name,', ',ph.first_name) AS physician
          FROM consultation c
          JOIN patient p ON c.patient_id=p.patient_id
@@ -194,14 +195,15 @@ if ($mode === 'summary') {
   <?php else: ?>
   <table>
     <thead>
-      <tr><th>Date</th><th>Physician</th><th>Symptoms / Diagnosis</th><th>Treatment</th><th>Remarks</th></tr>
+      <tr><th>Date</th><th>Physician</th><th>Chief Complaint</th><th>Diagnosis</th><th>Treatment</th><th>Remarks</th></tr>
     </thead>
     <tbody>
       <?php foreach ($consults as $c): ?>
       <tr>
         <td style="white-space:nowrap;"><?= htmlspecialchars($c['visit_date']) ?></td>
         <td><?= htmlspecialchars($c['physician'] ?? '—') ?></td>
-        <td><?= htmlspecialchars($c['symptoms_diagnosis'] ?? '—') ?></td>
+        <td><?= htmlspecialchars($c['chief_complaint'] ?? '—') ?></td>
+        <td><?= htmlspecialchars($c['diagnosis'] ?? '—') ?></td>
         <td><?= htmlspecialchars(mb_strimwidth($c['treatment'] ?? '—', 0, 80, '…')) ?></td>
         <td><?= htmlspecialchars(mb_strimwidth($c['remarks'] ?? '—', 0, 80, '…')) ?></td>
       </tr>
@@ -224,7 +226,7 @@ if ($mode === 'summary') {
   <?php else: ?>
   <table>
     <thead>
-      <tr><th>Date</th><th>Patient</th><th>Age</th><th>Sex</th><th>Address</th><th>Tag</th><th>Symptoms/Diagnosis</th><th>Physician</th></tr>
+      <tr><th>Date</th><th>Patient</th><th>Age</th><th>Sex</th><th>Address</th><th>Tag</th><th>Chief Complaint</th><th>Diagnosis</th><th>Physician</th></tr>
     </thead>
     <tbody>
       <?php foreach ($summaryRows as $r): ?>
@@ -238,7 +240,8 @@ if ($mode === 'summary') {
           <?= $r['is_ip'] === 'Yes'   ? '<span class="badge badge-ip">IP</span> ' : '' ?>
           <?= $r['nhts_status'] === 'NHTS' ? '<span class="badge badge-nhts">4Ps</span>' : '' ?>
         </td>
-        <td><?= htmlspecialchars(mb_strimwidth($r['symptoms_diagnosis'] ?? '—',0,40,'…')) ?></td>
+        <td><?= htmlspecialchars(mb_strimwidth($r['chief_complaint'] ?? '—',0,30,'…')) ?></td>
+        <td><?= htmlspecialchars(mb_strimwidth($r['diagnosis'] ?? '—',0,30,'…')) ?></td>
         <td><?= htmlspecialchars($r['physician'] ?? '—') ?></td>
       </tr>
       <?php endforeach; ?>

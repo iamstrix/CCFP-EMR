@@ -17,13 +17,13 @@ $where  = ['1=1'];
 
 if ($search) {
     $like = "%$search%";
-    $where[] = "(p.patient_name LIKE ? OR c.symptoms_diagnosis LIKE ?)";
-    $params  = array_merge($params, [$like,$like]);
+    $where[] = "(p.patient_name LIKE ? OR c.chief_complaint LIKE ? OR c.diagnosis LIKE ?)";
+    $params  = array_merge($params, [$like,$like,$like]);
 }
 if ($dateFrom) { $where[] = "c.visit_date >= ?"; $params[] = $dateFrom; }
 if ($dateTo)   { $where[] = "c.visit_date <= ?"; $params[] = $dateTo;   }
 
-$sql = "SELECT c.consultation_id, c.visit_date, c.symptoms_diagnosis,
+$sql = "SELECT c.consultation_id, c.visit_date, c.chief_complaint, c.diagnosis,
                p.patient_name, p.patient_id,
                CONCAT(ph.last_name,', ',ph.first_name) AS physician
         FROM consultation c
@@ -77,7 +77,8 @@ require_once ROOT . '/includes/header.php';
           <th>#</th>
           <th>Date</th>
           <th>Patient</th>
-          <th>Symptoms / Diagnosis</th>
+          <th>Chief Complaint</th>
+          <th>Diagnosis</th>
           <th>Physician</th>
           <th>Action</th>
         </tr>
@@ -88,7 +89,8 @@ require_once ROOT . '/includes/header.php';
           <td><?= $r['consultation_id'] ?></td>
           <td style="white-space:nowrap;"><?= htmlspecialchars($r['visit_date']) ?></td>
           <td><a href="../patients/view.php?id=<?= $r['patient_id'] ?>"><?= htmlspecialchars($r['patient_name']) ?></a></td>
-          <td><?= htmlspecialchars(mb_strimwidth($r['symptoms_diagnosis'] ?? '—',0,60,'…')) ?></td>
+          <td><?= htmlspecialchars(mb_strimwidth($r['chief_complaint'] ?? '—', 0, 40, '…')) ?></td>
+          <td><span class="badge badge-blue"><?= htmlspecialchars(mb_strimwidth($r['diagnosis'] ?? '—', 0, 40, '…')) ?></span></td>
           <td><?= htmlspecialchars($r['physician'] ?? '—') ?></td>
           <td><a href="view.php?id=<?= $r['consultation_id'] ?>" class="btn btn-sm btn-outline">View</a></td>
         </tr>

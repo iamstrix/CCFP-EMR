@@ -106,3 +106,13 @@ The severity degree of illnesses should only be appropriate and applicable to a 
 For each unique patient, there must be visible progress seen through the inputted data towards their specific condition E.g. some people exhibit recurring diseases over the course of a month. 
 
 Disperse the visit records over the course of four (4) months in between the range of December 14, 2026 to April 14, 2026.""
+
+28. "Patient Registration Page Optimization
+
+For the Clinical Evaluation parts of the form, these should be the fields
+
+Chief Complaint - Dropdown or Tags (Autofill search) to avoid open-ended categorization, resulting in dirty data
+
+Complaint Details - Second to the chief complaint. Open-ended short text input field
+
+Diagnosis - Dropdown or Tags (Autofill search) to avoid open-ended categorization, resulting in dirty data"

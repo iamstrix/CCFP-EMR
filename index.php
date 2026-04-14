@@ -22,7 +22,7 @@ $stats['nhts_households']      = $pdo->query("SELECT COUNT(DISTINCT household_no
 
 // ── Recent consultations ───────────────────────────────────
 $recentConsults = $pdo->query(
-    "SELECT c.consultation_id, c.visit_date, c.symptoms_diagnosis,
+    "SELECT c.consultation_id, c.visit_date, c.chief_complaint, c.diagnosis,
             p.patient_name
      FROM consultation c
      JOIN patient p ON c.patient_id = p.patient_id
@@ -84,7 +84,8 @@ $recentConsults = $pdo->query(
           <th>#</th>
           <th>Date</th>
           <th>Patient</th>
-          <th>Symptoms / Diagnosis</th>
+          <th>Chief Complaint</th>
+          <th>Diagnosis</th>
           <th>Action</th>
         </tr>
       </thead>
@@ -94,7 +95,8 @@ $recentConsults = $pdo->query(
           <td><?= $r['consultation_id'] ?></td>
           <td><?= htmlspecialchars($r['visit_date']) ?></td>
           <td><?= htmlspecialchars($r['patient_name']) ?></td>
-          <td><?= htmlspecialchars(mb_strimwidth($r['symptoms_diagnosis'] ?? '—', 0, 60, '…')) ?></td>
+          <td><?= htmlspecialchars(mb_strimwidth($r['chief_complaint'] ?? '—', 0, 30, '…')) ?></td>
+          <td><span class="badge badge-blue"><?= htmlspecialchars(mb_strimwidth($r['diagnosis'] ?? '—', 0, 40, '…')) ?></span></td>
           <td>
             <a class="btn btn-sm btn-outline"
                href="consultations/view.php?id=<?= $r['consultation_id'] ?>">View</a>
