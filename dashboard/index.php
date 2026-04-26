@@ -14,7 +14,9 @@ $timeFilter = $_GET['time_filter'] ?? 'all';
 $startDate = $_GET['start_date'] ?? '';
 $endDate = $_GET['end_date'] ?? '';
 
+$params = [];
 $visitCond = "";
+
 if ($timeFilter === 'today') {
     $visitCond = " AND visit_date = CURDATE()";
 } elseif ($timeFilter === '7days') {
@@ -24,35 +26,45 @@ if ($timeFilter === 'today') {
 } elseif ($timeFilter === '6months') {
     $visitCond = " AND visit_date >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)";
 } elseif ($timeFilter === 'custom' && $startDate && $endDate) {
-    $visitCond = " AND visit_date >= " . $pdo->quote($startDate) . " AND visit_date <= " . $pdo->quote($endDate);
+    $visitCond = " AND visit_date >= :start_date AND visit_date <= :end_date";
+    $params[':start_date'] = $startDate;
+    $params[':end_date'] = $endDate;
 }
 
 $cVisitCond = str_replace('visit_date', 'c.visit_date', $visitCond);
 $patientWhere = $visitCond ? "WHERE EXISTS (SELECT 1 FROM consultation c WHERE c.patient_id = patient.patient_id {$cVisitCond})" : "";
 $hhWhere = $visitCond ? "WHERE EXISTS (SELECT 1 FROM consultation c WHERE c.patient_id = p.patient_id {$cVisitCond})" : "";
 
+// Helper to execute prepared queries with shared params
+function execQuery($pdo, $sql, $params) {
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
+    return $stmt;
+}
+
 // ── 1. Top diagnoses ──────────────────────────────────────
-$topDx = $pdo->query(
-    "SELECT diagnosis, COUNT(*) AS cnt
-     FROM consultation
-     WHERE diagnosis IS NOT NULL AND diagnosis <> '' {$visitCond}
-     GROUP BY diagnosis
-     ORDER BY cnt DESC
-     LIMIT 10"
-)->fetchAll();
+$topDxSql = "SELECT diagnosis, COUNT(*) AS cnt
+             FROM consultation
+             WHERE diagnosis IS NOT NULL AND diagnosis <> '' {$visitCond}
+             GROUP BY diagnosis
+             ORDER BY cnt DESC
+             LIMIT 10";
+$topDx = execQuery($pdo, $topDxSql, $params)->fetchAll();
 
 // ── 2. Time-Trend Tracking ────────────────────────
 $chartLineTitle = "Monthly Visits (Last 12 Months)";
+$trendParams = $params;
 
 if ($timeFilter === 'today') {
-    $trendQuery = "SELECT HOUR(IFNULL(created_at,'08:00:00')) AS ym,
-                          DATE_FORMAT(IFNULL(created_at,'08:00:00'), '%h:00 %p') AS label,
+    $trendQuery = "SELECT HOUR(IFNULL(created_at, CONCAT(visit_date, ' 08:00:00'))) AS ym,
+                          DATE_FORMAT(IFNULL(created_at, CONCAT(visit_date, ' 08:00:00')), '%h:00 %p') AS label,
                           COUNT(*) AS cnt
                    FROM consultation
                    WHERE visit_date = CURDATE()
                    GROUP BY ym, label
                    ORDER BY ym";
     $chartLineTitle = "Hourly Visits (Today)";
+    $trendParams = []; // Filters are hardcoded for 'today' in this query
 } elseif ($timeFilter === '7days') {
     $trendQuery = "SELECT DATE(visit_date) AS ym,
                           DATE_FORMAT(visit_date, '%b %d') AS label,
@@ -62,6 +74,7 @@ if ($timeFilter === 'today') {
                    GROUP BY ym, label
                    ORDER BY ym";
     $chartLineTitle = "Daily Visits (Last 7 Days)";
+    $trendParams = [];
 } elseif ($timeFilter === '30days') {
     $trendQuery = "SELECT DATE(visit_date) AS ym,
                           DATE_FORMAT(visit_date, '%b %d') AS label,
@@ -71,6 +84,7 @@ if ($timeFilter === 'today') {
                    GROUP BY ym, label
                    ORDER BY ym";
     $chartLineTitle = "Daily Visits (Last 30 Days)";
+    $trendParams = [];
 } elseif ($timeFilter === '6months') {
     $trendQuery = "SELECT DATE_FORMAT(visit_date,'%Y-%m') AS ym,
                           DATE_FORMAT(visit_date,'%b %Y') AS label,
@@ -80,12 +94,13 @@ if ($timeFilter === 'today') {
                    GROUP BY ym, label
                    ORDER BY ym";
     $chartLineTitle = "Monthly Visits (Last 6 Months)";
+    $trendParams = [];
 } elseif ($timeFilter === 'custom' && $startDate && $endDate) {
     $trendQuery = "SELECT DATE(visit_date) AS ym,
                           DATE_FORMAT(visit_date, '%b %d, %Y') AS label,
                           COUNT(*) AS cnt
                    FROM consultation
-                   WHERE visit_date >= " . $pdo->quote($startDate) . " AND visit_date <= " . $pdo->quote($endDate) . "
+                   WHERE visit_date >= :start_date AND visit_date <= :end_date
                    GROUP BY ym, label
                    ORDER BY ym";
     $chartLineTitle = "Daily Visits (Custom Range)";
@@ -102,36 +117,35 @@ if ($timeFilter === 'today') {
         $chartLineTitle = "All Time Visits";
     }
 }
-$visitsByMonth = $pdo->query($trendQuery)->fetchAll();
+$visitsByMonth = execQuery($pdo, $trendQuery, $trendParams)->fetchAll();
 
 // ── 3. Sex breakdown ─────────────────────────────────────
-$sexBreakdown = $pdo->query(
-    "SELECT sex, COUNT(*) AS cnt FROM patient {$patientWhere} GROUP BY sex"
-)->fetchAll();
+$sexSql = "SELECT sex, COUNT(*) AS cnt FROM patient {$patientWhere} GROUP BY sex";
+$sexBreakdown = execQuery($pdo, $sexSql, $params)->fetchAll();
 
 // ── 4. Age groups (Patient Categories) ─────────────────────
-$ageGroups = $pdo->query(
-    "SELECT age_group, COUNT(*) AS cnt
-     FROM patient {$patientWhere}
-     GROUP BY age_group
-     ORDER BY FIELD(age_group, 'Pediatric', 'Adult', 'Geriatric')"
-)->fetchAll();
+$ageSql = "SELECT age_group, COUNT(*) AS cnt
+           FROM patient {$patientWhere}
+           GROUP BY age_group
+           ORDER BY FIELD(age_group, 'Pediatric', 'Adult', 'Geriatric')";
+$ageGroups = execQuery($pdo, $ageSql, $params)->fetchAll();
 
 // ── 5. Demographics (Replaces Category) ────────────────────
-$demog = $pdo->query(
-    "SELECT
-       SUM(is_ip='Yes' AND nhts_status='NON-NHTS')  AS ip_only,
-       SUM(nhts_status='NHTS' AND is_ip='No')  AS nhts_only,
-       SUM(is_ip='Yes' AND nhts_status='NHTS')  AS ip_and_nhts,
-       SUM(is_ip='No' AND nhts_status='NON-NHTS')  AS regular
-     FROM patient p {$hhWhere}"
-)->fetch();
+$demogSql = "SELECT
+               SUM(is_ip='Yes' AND nhts_status='NON-NHTS')  AS ip_only,
+               SUM(nhts_status='NHTS' AND is_ip='No')  AS nhts_only,
+               SUM(is_ip='Yes' AND nhts_status='NHTS')  AS ip_and_nhts,
+               SUM(is_ip='No' AND nhts_status='NON-NHTS')  AS regular
+             FROM patient p {$hhWhere}";
+$demog = execQuery($pdo, $demogSql, $params)->fetch();
 
 // ── Summary stats ─────────────────────────────────────────
-$totPat  = $pdo->query("SELECT COUNT(*) FROM patient {$patientWhere}")->fetchColumn();
-$totCons = $pdo->query("SELECT COUNT(*) FROM consultation WHERE 1=1 {$visitCond}")->fetchColumn();
-$totHH   = $pdo->query("SELECT COUNT(DISTINCT household_no) FROM patient p {$hhWhere}")->fetchColumn();
-$thisMonth = $pdo->query("SELECT COUNT(*) FROM consultation WHERE MONTH(visit_date)=MONTH(CURDATE()) AND YEAR(visit_date)=YEAR(CURDATE()) {$visitCond}")->fetchColumn();
+$totPat  = execQuery($pdo, "SELECT COUNT(*) FROM patient {$patientWhere}", $params)->fetchColumn();
+$totCons = execQuery($pdo, "SELECT COUNT(*) FROM consultation WHERE 1=1 {$visitCond}", $params)->fetchColumn();
+$totHH   = execQuery($pdo, "SELECT COUNT(DISTINCT household_no) FROM patient p {$hhWhere}", $params)->fetchColumn();
+
+$thisMonthSql = "SELECT COUNT(*) FROM consultation WHERE MONTH(visit_date)=MONTH(CURDATE()) AND YEAR(visit_date)=YEAR(CURDATE()) {$visitCond}";
+$thisMonth = execQuery($pdo, $thisMonthSql, $params)->fetchColumn();
 
 // ── PHP → JS helpers ──────────────────────────────────────
 function jsArray(array $data, string $key): string {
@@ -245,7 +259,7 @@ function toggleExpandCard(el) {
 </div>
 
 <!-- Row 2: Pie / doughnut charts -->
-<div class="chart-grid" style="grid-template-columns:repeat(auto-fill,minmax(280px,1fr));">
+<div class="chart-grid">
   <div class="card">
     <div class="card-title">Sex Breakdown</div>
     <div class="chart-box" style="height:240px;"><canvas id="chartSex"></canvas></div>
@@ -254,9 +268,13 @@ function toggleExpandCard(el) {
     <div class="card-title">Age Groups</div>
     <div class="chart-box" style="height:240px;"><canvas id="chartAge"></canvas></div>
   </div>
-  <div class="card" style="grid-column: span 2;">
+</div>
+
+<!-- Row 3: Wide Demographics -->
+<div class="chart-grid" style="grid-template-columns: 1fr;">
+  <div class="card">
     <div class="card-title">Patient Demographics</div>
-    <div class="chart-box" style="height:240px;"><canvas id="chartDemog"></canvas></div>
+    <div class="chart-box" style="height:300px;"><canvas id="chartDemog"></canvas></div>
   </div>
 </div>
 
@@ -375,11 +393,12 @@ new Chart(document.getElementById('chartDemog'), {
     }]
   },
   options: {
+    indexAxis: 'y',
     responsive: true, maintainAspectRatio: false,
     plugins: { legend: { display: false } },
-    scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+    scales: { x: { beginAtZero: true, ticks: { precision: 0 } } }
   }
 });
 </script>
 
-<?php require_once ROOT . '/includes/footer.php'; ?>
+<?php require_once ROOT . '/includes/header.php'; ?>
