@@ -1,25 +1,40 @@
-# ValdesCare — Quick Setup Guide
+# AUF — Don Emiliano J. Valdes Medical Clinic
+### Clinical Decision Support & Patient Trace Analytics System
 
-## Requirements
-- XAMPP (Apache + MySQL) installed and running
-- PHP 7.4+ (XAMPP includes this)
-
-## Step 1 — Import the Database Schema
-
-> **This is the most important step.** The system will not work without it.
-
-1. Open **phpMyAdmin** → `http://localhost/phpmyadmin`
-2. Click **SQL** in the top navigation bar
-3. Click **Choose File** → select `valdescare_schema.sql` from this folder
-4. Click **Go**
-
-This will create the `valdescare` database and all tables automatically.
+A professional, offline-first clinical management system designed for the AUF Don Emiliano J. Valdes Medical Clinic. This application provides patient registration, clinical encounter tracking, and dynamic health analytics.
 
 ---
 
-## Step 2 — Download Chart.js (already done if you see this file)
+## 🚀 Key Features
+- **Dynamic Analytics Dashboard**: Real-time tracking of patient volume, demographics, and top diagnoses with interactive Chart.js visualizations.
+- **Patient Information Record**: Comprehensive digital management of patient profiles, household data, and PhilHealth status.
+- **Clinical Encounters**: Structured logging of chief complaints, diagnoses, and treatments.
+- **Physician Management**: Directory of attending physicians and health workers.
+- **Report Export**: Generation of printable patient history and medical summaries.
+- **Local Network Ready**: Optimized for deployment in LAN environments (XAMPP).
 
-The file `assets/js/chart.min.js` must exist. If missing, run in PowerShell:
+---
+
+## 🛠️ Requirements
+- **XAMPP** (Apache + MySQL)
+- **PHP 7.4+**
+- **Browser**: Modern browser (Chrome, Edge, Firefox)
+
+---
+
+## 📥 Installation & Setup
+
+### 1. Database Configuration
+The system requires a MySQL database named `valdescare`.
+
+1. Open **phpMyAdmin** (`http://localhost/phpmyadmin`).
+2. Create a new database named `valdescare`.
+3. Select the `valdescare` database and click the **Import** tab.
+4. Choose `valdescare_schema.sql` from the root of this project.
+5. Click **Go**.
+
+### 2. Assets (Chart.js)
+The system uses **Chart.js** for analytics. The file `assets/js/chart.min.js` should be present. If it is missing, you can download it via PowerShell:
 
 ```powershell
 Invoke-WebRequest `
@@ -27,52 +42,39 @@ Invoke-WebRequest `
   -OutFile "assets\js\chart.min.js"
 ```
 
-Or download manually from https://www.chartjs.org/docs/latest/getting-started/ and save as `assets/js/chart.min.js`.
+### 3. Access the System
+Place the project folder in your XAMPP `htdocs` directory and navigate to:
+`http://localhost/ccs06-appdev/final-test/`
 
 ---
 
-## Step 3 — Open the Application
-
-Navigate to: **http://localhost/ccs06-appdev/final-test/**
-
----
-
-## File Structure
-
-```
+## 📂 Project Structure
+```text
 final-test/
-├── valdescare_schema.sql   ← Import this first!
-├── db_connect.php          ← Database connection (edit DB_PASS if needed)
-├── index.php               ← Home dashboard
-├── assets/
-│   ├── css/style.css
-│   └── js/chart.min.js     ← Download separately (see Step 2)
-├── includes/
-│   ├── header.php
-│   └── footer.php
-├── patients/
-│   ├── register.php        ← Register new patient
-│   ├── list.php            ← Searchable patient list
-│   └── view.php            ← Patient detail + history
-├── consultations/
-│   ├── new.php             ← New encounter (vitals + clinical notes)
-│   ├── list.php            ← Encounter log with filters
-│   └── view.php            ← Single encounter detail
-├── dashboard/
-│   └── index.php           ← Analytics + Chart.js visualizations
-├── physicians/
-│   └── manage.php          ← Physician directory management
-└── exports/
-    └── report.php          ← Printable patient record / summary report
+├── dashboard/        ← Analytics & Chart.js visualizations
+├── patients/         ← Patient registration & history
+├── consultations/    ← Encounter logging (New/List/View)
+├── physicians/       ← Staff directory management
+├── exports/          ← Printable report generation
+├── assets/           ← CSS & JS (Chart.js)
+├── includes/         ← Shared UI components (Header/Footer)
+├── db_connect.php    ← Core DB config & Timezone (Asia/Manila)
+└── valdescare_schema.sql
 ```
 
 ---
 
-## Troubleshooting
+## ⚙️ Configuration Notes
+- **Timezone**: Defaulted to `Asia/Manila` (UTC+8) in `db_connect.php`.
+- **Database**: Edit `db_connect.php` if your MySQL root user has a password.
+- **Validation**: Future dates are automatically blocked in encounters and registration to ensure data integrity.
 
-| Error | Fix |
-|---|---|
-| "Database Connection Error" | Make sure XAMPP MySQL is running and you imported `valdescare_schema.sql` |
-| Charts not showing | Make sure `assets/js/chart.min.js` exists (see Step 2) |
-| Column not found errors | Re-import `valdescare_schema.sql` — the database was likely created manually without all columns |
-| Blank/plain-text page | Check that XAMPP Apache is running |
+---
+
+## ❓ Troubleshooting
+| Issue | Solution |
+| :--- | :--- |
+| **Database Connection Error** | Verify MySQL is running in XAMPP and `valdescare` database is imported. |
+| **Charts not showing** | Ensure `assets/js/chart.min.js` exists in the assets folder. |
+| **Incorrect Time** | The system is set to Manila time. Check your server's system clock if offsets persist. |
+| **Missing CSS/Styles** | Ensure you are accessing the site via `http://localhost/` and not opening the `.php` file directly. |
