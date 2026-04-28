@@ -65,11 +65,18 @@ require_once ROOT . '/includes/header.php';
   <div class="alert alert-success"><?= $success ?></div>
 <?php endif; ?>
 
-<div style="margin-bottom: 1.2rem;" class="no-print">
-  <a href="../index.php" class="btn btn-sm btn-outline">
-    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-    Back to Dashboard
-  </a>
+<!-- Page Header -->
+<div class="page-header">
+  <div class="page-header-title">
+    <h1>New Clinical Encounter</h1>
+    <p class="text-muted">Record a new consultation or treatment plan.</p>
+  </div>
+  <div class="page-header-actions no-print">
+    <a href="../index.php" class="btn btn-back-hub">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+      Back to Dashboard
+    </a>
+  </div>
 </div>
 
 <form method="POST" action="">

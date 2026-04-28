@@ -675,3 +675,43 @@ html {
 .card {
   scroll-margin-top: 85px; /* Account for sticky header */
 }
+
+/* ── Page Header Layout ── */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+}
+
+.page-header-title h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--clr-primary-dk);
+}
+
+.page-header-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+/* ── Specific 'Back to Hub' Style matching report.php ── */
+.btn-back-hub {
+  background: #fff !important;
+  border: 1.5px solid var(--clr-primary) !important;
+  color: var(--clr-primary) !important;
+  padding: .6rem 1.2rem !important;
+  border-radius: 6px !important;
+  font-size: .82rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.04em !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.btn-back-hub:hover {
+  background: var(--clr-primary-lt) !important;
+  text-decoration: none !important;
+}
