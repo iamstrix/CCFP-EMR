@@ -284,9 +284,7 @@ function saveRecordPdf() {
       </div>
 
       <button type="submit" class="btn btn-sm btn-primary">Filter</button>
-      <?php if($cTimeFilter !== 'all'): ?>
-        <a href="?id=<?= $id ?>" class="btn btn-sm btn-outline">Reset</a>
-      <?php endif; ?>
+      <a href="?id=<?= $id ?>" class="btn btn-sm btn-outline">Reset</a>
     </form>
   </div>
   <div class="chart-box" style="height: 220px; margin-top: 1rem;">
@@ -320,9 +318,7 @@ function saveRecordPdf() {
       </div>
 
       <button type="submit" class="btn btn-sm btn-primary">Filter</button>
-      <?php if($timeFilter !== 'all' || $monthYear): ?>
-        <a href="?id=<?= $id ?>#history-section" class="btn btn-sm btn-outline">Reset</a>
-      <?php endif; ?>
+      <a href="?id=<?= $id ?>#history-section" class="btn btn-sm btn-outline">Reset</a>
     </form>
   </div>
 
