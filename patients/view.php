@@ -63,44 +63,103 @@ $consults = $history->fetchAll();
 $pageTitle = htmlspecialchars($patient['patient_name']);
 $activeNav = 'patients';
 
-// ── Chart Range Logic ──────────────────────────────────────
-$chartFilter = $_GET['chart_filter'] ?? '12months';
-$chartInterval = 11; // Default: 12 months (including current)
-$chartTitle = "Last 12 Months";
+// ── Chart Filter Logic (Synchronized with Dashboard) ────────
+$cTimeFilter = $_GET['c_time_filter'] ?? 'all';
+$cStartDate  = $_GET['c_start_date']  ?? '';
+$cEndDate    = $_GET['c_end_date']    ?? '';
 
-if ($chartFilter === '6months') {
-    $chartInterval = 5;
-    $chartTitle = "Last 6 Months";
-} elseif ($chartFilter === '2years') {
-    $chartInterval = 23;
-    $chartTitle = "Last 2 Years";
+$cNow = new DateTime();
+$cStart = null;
+$cEnd = clone $cNow;
+$cInterval = null;
+$cFormatLabel = "";
+$cFormatYM = "";
+$cPeriodCount = 0;
+$chartTitleText = "Visit History";
+
+if ($cTimeFilter === 'today') {
+    $cStart = (clone $cNow)->setTime(0, 0);
+    $cEnd = (clone $cNow)->setTime(23, 59);
+    $cInterval = new DateInterval('PT1H');
+    $cFormatLabel = "h:00 A";
+    $cFormatYM = "G"; 
+    $cPeriodCount = 24;
+    $chartTitleText = "Hourly Visits (Today)";
+} elseif ($cTimeFilter === '7days') {
+    $cStart = (clone $cNow)->modify('-6 days');
+    $cInterval = new DateInterval('P1D');
+    $cFormatLabel = "M d";
+    $cFormatYM = "Y-m-d";
+    $cPeriodCount = 7;
+    $chartTitleText = "Daily Visits (Last 7 Days)";
+} elseif ($cTimeFilter === '30days') {
+    $cStart = (clone $cNow)->modify('-29 days');
+    $cInterval = new DateInterval('P1D');
+    $cFormatLabel = "M d";
+    $cFormatYM = "Y-m-d";
+    $cPeriodCount = 30;
+    $chartTitleText = "Daily Visits (Last 30 Days)";
+} elseif ($cTimeFilter === '6months') {
+    $cStart = (clone $cNow)->modify('-5 months')->modify('first day of this month');
+    $cInterval = new DateInterval('P1M');
+    $cFormatLabel = "M Y";
+    $cFormatYM = "Y-m";
+    $cPeriodCount = 6;
+    $chartTitleText = "Monthly Visits (Last 6 Months)";
+} elseif ($cTimeFilter === 'custom' && $cStartDate && $cEndDate) {
+    $cStart = new DateTime($cStartDate);
+    $cEnd = new DateTime($cEndDate);
+    $cInterval = new DateInterval('P1D');
+    $cFormatLabel = "M d, Y";
+    $cFormatYM = "Y-m-d";
+    $cPeriodCount = $cStart->diff($cEnd)->days + 1;
+    $chartTitleText = "Daily Visits (Custom)";
+} else {
+    // All Time (showing last 12 months by default, or all if we want)
+    $cStart = (clone $cNow)->modify('-11 months')->modify('first day of this month');
+    $cInterval = new DateInterval('P1M');
+    $cFormatLabel = "M Y";
+    $cFormatYM = "Y-m";
+    $cPeriodCount = 12;
+    $chartTitleText = "Monthly Visits (All Time)";
 }
 
-// ── Visit trend data ───────────────────────────────────────
-$trendSql = "
-    SELECT DATE_FORMAT(visit_date, '%Y-%m') as ym, COUNT(*) as cnt
-    FROM consultation
-    WHERE patient_id = ? AND visit_date >= DATE_SUB(CURDATE(), INTERVAL $chartInterval MONTH)
-    GROUP BY ym
-    ORDER BY ym ASC
-";
-$trendStmt = $pdo->prepare($trendSql);
-$trendStmt->execute([$id]);
-$trendRaw = $trendStmt->fetchAll(PDO::FETCH_KEY_PAIR);
-
-// Gap-fill based on interval
-$trendData = [];
-for ($i = $chartInterval; $i >= 0; $i--) {
-    $m = date('Y-m', strtotime("-$i months"));
-    $label = date('M Y', strtotime("-$i months"));
-    $trendData[] = [
-        'label' => $label,
-        'cnt' => (int)($trendRaw[$m] ?? 0)
+// 1. Generate Timeline
+$cLabels = [];
+$cTimeline = new DatePeriod($cStart, $cInterval, $cPeriodCount - 1);
+foreach ($cTimeline as $dt) {
+    $cLabels[$dt->format($cFormatYM)] = [
+        'ym' => $dt->format($cFormatYM),
+        'label' => $dt->format($cFormatLabel),
+        'cnt' => 0
     ];
 }
+$cLabels[$cEnd->format($cFormatYM)] = ['ym' => $cEnd->format($cFormatYM), 'label' => $cEnd->format($cFormatLabel), 'cnt' => 0];
 
-$chartLabels = json_encode(array_column($trendData, 'label'));
-$chartValues = json_encode(array_column($trendData, 'cnt'));
+// 2. Fetch Data
+$cParams = [$id];
+if ($cTimeFilter === 'today') {
+    $sql = "SELECT HOUR(IFNULL(created_at, CONCAT(visit_date, ' 08:00:00'))) AS key_val, COUNT(*) AS cnt 
+            FROM consultation WHERE patient_id = ? AND visit_date = CURDATE() GROUP BY key_val";
+} elseif (in_array($cTimeFilter, ['7days', '30days', 'custom'])) {
+    $sql = "SELECT DATE(visit_date) AS key_val, COUNT(*) AS cnt FROM consultation WHERE patient_id = ? AND visit_date BETWEEN ? AND ? GROUP BY key_val";
+    $cParams[] = $cStart->format('Y-m-d');
+    $cParams[] = $cEnd->format('Y-m-d');
+} else {
+    $sql = "SELECT DATE_FORMAT(visit_date, '%Y-%m') AS key_val, COUNT(*) AS cnt FROM consultation WHERE patient_id = ? GROUP BY key_val";
+}
+$cStmt = $pdo->prepare($sql);
+$cStmt->execute($cParams);
+$cDbData = $cStmt->fetchAll(PDO::FETCH_KEY_PAIR);
+
+// 3. Merge
+foreach ($cDbData as $k => $v) {
+    if (isset($cLabels[$k])) $cLabels[$k]['cnt'] = (int)$v;
+}
+$visitsByPeriod = array_values($cLabels);
+
+$chartLabels = json_encode(array_column($visitsByPeriod, 'label'));
+$chartValues = json_encode(array_column($visitsByPeriod, 'cnt'));
 
 require_once ROOT . '/includes/header.php';
 ?>
@@ -197,20 +256,37 @@ function saveRecordPdf() {
 
 <!-- Visit Trend Visualization -->
 <div class="card">
-  <div style="display:flex; justify-content:space-between; align-items:center;">
-    <div class="card-title" style="margin:0;">Visit Frequency (<?= $chartTitle ?>)</div>
-    <form method="GET" class="no-print form-group" style="margin:0;">
+  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1.2rem;">
+    <div class="card-title" style="margin:0;"><?= $chartTitleText ?></div>
+    
+    <form method="GET" class="no-print flex gap-2" style="align-items:flex-end; flex-wrap:wrap; margin:0;">
       <input type="hidden" name="id" value="<?= $id ?>">
       <!-- Preserve history filters if any -->
       <input type="hidden" name="time_filter" value="<?= htmlspecialchars($timeFilter) ?>">
       <input type="hidden" name="start_date" value="<?= htmlspecialchars($startDate) ?>">
       <input type="hidden" name="end_date" value="<?= htmlspecialchars($endDate) ?>">
       
-      <select name="chart_filter" onchange="this.form.submit()" style="padding: 0.35rem 0.6rem; font-size: 0.85rem;">
-        <option value="6months"  <?= $chartFilter==='6months'  ? 'selected':'' ?>>Last 6 Months</option>
-        <option value="12months" <?= $chartFilter==='12months' ? 'selected':'' ?>>Last 12 Months</option>
-        <option value="2years"   <?= $chartFilter==='2years'   ? 'selected':'' ?>>Last 2 Years</option>
-      </select>
+      <div class="form-group" style="margin:0;">
+        <select name="c_time_filter" onchange="toggleChartCustomDates(this.value)" style="padding: 0.35rem 0.6rem; font-size: 0.85rem;">
+          <option value="all"      <?= $cTimeFilter==='all'     ? 'selected':'' ?>>All Time</option>
+          <option value="today"    <?= $cTimeFilter==='today'   ? 'selected':'' ?>>Today</option>
+          <option value="7days"    <?= $cTimeFilter==='7days'   ? 'selected':'' ?>>Last 7 Days</option>
+          <option value="30days"   <?= $cTimeFilter==='30days'  ? 'selected':'' ?>>Last 30 Days</option>
+          <option value="6months"  <?= $cTimeFilter==='6months' ? 'selected':'' ?>>Last 6 Months</option>
+          <option value="custom"   <?= $cTimeFilter==='custom'  ? 'selected':'' ?>>Custom Range</option>
+        </select>
+      </div>
+
+      <div class="chart-custom-date flex gap-2" style="display: <?= $cTimeFilter==='custom'?'flex':'none' ?>; align-items:center;">
+        <input type="date" name="c_start_date" value="<?= htmlspecialchars($cStartDate) ?>" style="padding: 0.3rem; font-size: 0.85rem; border:1px solid var(--clr-border); border-radius:4px;">
+        <span class="text-muted">to</span>
+        <input type="date" name="c_end_date" value="<?= htmlspecialchars($cEndDate) ?>" style="padding: 0.3rem; font-size: 0.85rem; border:1px solid var(--clr-border); border-radius:4px;">
+      </div>
+
+      <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+      <?php if($cTimeFilter !== 'all'): ?>
+        <a href="?id=<?= $id ?>" class="btn btn-sm btn-outline">Reset</a>
+      <?php endif; ?>
     </form>
   </div>
   <div class="chart-box" style="height: 220px; margin-top: 1rem;">
@@ -297,6 +373,9 @@ function saveRecordPdf() {
 <script>
 function toggleCustomDates(val) {
     document.querySelectorAll('.custom-date').forEach(el => el.style.display = (val === 'custom') ? 'flex' : 'none');
+}
+function toggleChartCustomDates(val) {
+    document.querySelectorAll('.chart-custom-date').forEach(el => el.style.display = (val === 'custom') ? 'flex' : 'none');
 }
 
 document.addEventListener('DOMContentLoaded', function() {
