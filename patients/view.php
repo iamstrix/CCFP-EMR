@@ -154,19 +154,16 @@ require_once ROOT . '/includes/header.php';
     </div>
   </div>
 
-  <div class="form-actions" style="margin-top:.8rem;">
     <a href="../consultations/new.php?patient_id=<?= $id ?>" class="btn btn-primary no-print">New Encounter</a>
     <a href="list.php" class="btn btn-outline no-print">Back to List</a>
-    <div class="flex gap-2 no-print">
-      <button onclick="window.print()" class="btn btn-outline" style="display: flex; align-items: center; gap: 0.5rem;">
-        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2m-10 0v5h8v-5m-9-5h.01"></path></svg>
-        Print Record
-      </button>
-      <button onclick="saveRecordPdf()" class="btn btn-primary" style="display: flex; align-items: center; gap: 0.5rem;">
-        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-        Save as PDF
-      </button>
-    </div>
+    <button onclick="window.print()" class="btn btn-outline no-print">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2m-10 0v5h8v-5m-9-5h.01"></path></svg>
+      Print Record
+    </button>
+    <button onclick="saveRecordPdf()" class="btn btn-primary no-print">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+      Save as PDF
+    </button>
   </div>
 </div>
 
@@ -202,14 +199,14 @@ function saveRecordPdf() {
 <div class="card">
   <div style="display:flex; justify-content:space-between; align-items:center;">
     <div class="card-title" style="margin:0;">Visit Frequency (<?= $chartTitle ?>)</div>
-    <form method="GET" class="no-print" style="margin:0;">
+    <form method="GET" class="no-print form-group" style="margin:0;">
       <input type="hidden" name="id" value="<?= $id ?>">
       <!-- Preserve history filters if any -->
       <input type="hidden" name="time_filter" value="<?= htmlspecialchars($timeFilter) ?>">
       <input type="hidden" name="start_date" value="<?= htmlspecialchars($startDate) ?>">
       <input type="hidden" name="end_date" value="<?= htmlspecialchars($endDate) ?>">
       
-      <select name="chart_filter" onchange="this.form.submit()" style="padding: 0.3rem 0.5rem; font-size: 0.8rem; border: 1px solid #ddd; border-radius: 4px; background: #f9fafb; color: #374151; cursor: pointer;">
+      <select name="chart_filter" onchange="this.form.submit()" style="padding: 0.35rem 0.6rem; font-size: 0.85rem;">
         <option value="6months"  <?= $chartFilter==='6months'  ? 'selected':'' ?>>Last 6 Months</option>
         <option value="12months" <?= $chartFilter==='12months' ? 'selected':'' ?>>Last 12 Months</option>
         <option value="2years"   <?= $chartFilter==='2years'   ? 'selected':'' ?>>Last 2 Years</option>
