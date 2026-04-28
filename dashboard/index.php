@@ -193,11 +193,26 @@ require_once ROOT . '/includes/header.php';
     <h1 style="font-size: 1.8rem; font-weight: 700; color: var(--clr-primary-dk);">Analytics Dashboard</h1>
     <p class="text-muted">Clinical data overview and service performance metrics.</p>
   </div>
-  <button onclick="window.print()" class="btn btn-outline no-print" style="display: flex; align-items: center; gap: 0.5rem;">
-    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2m-10 0v5h8v-5m-9-5h.01"></path></svg>
-    Print Report
-  </button>
+  <div class="flex gap-2 no-print">
+    <button onclick="window.print()" class="btn btn-outline" style="display: flex; align-items: center; gap: 0.5rem;">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2m-10 0v5h8v-5m-9-5h.01"></path></svg>
+      Print Report
+    </button>
+    <button onclick="saveDashboardPdf()" class="btn btn-primary" style="display: flex; align-items: center; gap: 0.5rem;">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+      Save as PDF
+    </button>
+  </div>
 </div>
+
+<script>
+function saveDashboardPdf() {
+    const originalTitle = document.title;
+    document.title = "Clinic_Analytics_Dashboard_<?= date('Y-m-d') ?>";
+    window.print();
+    document.title = originalTitle;
+}
+</script>
 
 <style media="print">
   .sidebar, .topbar, form, .no-print, .btn, [title="Click to expand"] small { display: none !important; }
