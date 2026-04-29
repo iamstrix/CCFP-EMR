@@ -75,12 +75,38 @@ $chartTitleText = "Visit History";
 
 // Logic adapted to unified $timeFilter
 if ($timeFilter === 'today') {
-    $cStart = (clone $cNow)->setTime(0, 0);
-    $cEnd = (clone $cNow)->setTime(23, 59);
+    // 1. Check for actual data boundaries today for this patient
+    $bounds = $pdo->prepare("SELECT MIN(HOUR(created_at)) as min_h, MAX(HOUR(created_at)) as max_h 
+                           FROM consultation WHERE patient_id = ? AND visit_date = CURDATE() AND is_deleted = 0");
+    $bounds->execute([$id]);
+    $res = $bounds->fetch();
+    $minDataHour = ($res && $res['min_h'] !== null) ? (int)$res['min_h'] : 24;
+    $maxDataHour = ($res && $res['max_h'] !== null) ? (int)$res['max_h'] : 0;
+
+    // 2. Fetch dynamic settings
+    $settings = $pdo->query("SELECT setting_key, setting_value FROM settings")->fetchAll(PDO::FETCH_KEY_PAIR);
+    $clinicOpen = $settings['clinic_open'] ?? '08:30';
+    $clinicClose = $settings['clinic_close'] ?? '12:00';
+
+    $openDT = new DateTime($clinicOpen);
+    $closeDT = new DateTime($clinicClose);
+    $startDT = (clone $openDT)->modify('-30 minutes');
+    $endDT = (clone $closeDT)->modify('+30 minutes');
+
+    $configStartHour = (int)$startDT->format('G');
+    $configEndHour = (int)$endDT->format('G');
+    if ((int)$endDT->format('i') > 0) $configEndHour++;
+
+    // 3. Final scaling: Broader of Config or Data
+    $startHour = min($configStartHour, $minDataHour);
+    $endHour   = max($configEndHour, $maxDataHour);
+
+    $cStart = (clone $cNow)->setTime($startHour, 0);
+    $cEnd = (clone $cNow)->setTime($endHour, 0);
     $cInterval = new DateInterval('PT1H');
     $cFormatLabel = "h:00 A";
     $cFormatYM = "G"; 
-    $cPeriodCount = 24;
+    $cPeriodCount = ($endHour - $startHour) + 1;
     $chartTitleText = "Hourly Visits (Today)";
 } elseif ($timeFilter === '7days') {
     $cStart = (clone $cNow)->modify('-6 days');

@@ -65,7 +65,14 @@ $formatYM = "";
 $periodCount = 0;
 
 if ($timeFilter === 'today') {
-    // Fetch dynamic settings
+    // 1. Check for actual data boundaries today to ensure all visits are visible
+    // (Edge case: Visit outside standard hours should still appear)
+    $bounds = $pdo->query("SELECT MIN(HOUR(created_at)) as min_h, MAX(HOUR(created_at)) as max_h 
+                           FROM consultation WHERE visit_date = CURDATE() AND is_deleted = 0")->fetch();
+    $minDataHour = ($bounds && $bounds['min_h'] !== null) ? (int)$bounds['min_h'] : 24;
+    $maxDataHour = ($bounds && $bounds['max_h'] !== null) ? (int)$bounds['max_h'] : 0;
+
+    // 2. Fetch dynamic settings
     $settings = $pdo->query("SELECT setting_key, setting_value FROM settings")->fetchAll(PDO::FETCH_KEY_PAIR);
     $clinicOpen = $settings['clinic_open'] ?? '08:30';
     $clinicClose = $settings['clinic_close'] ?? '12:00';
@@ -75,10 +82,13 @@ if ($timeFilter === 'today') {
     $startDT = (clone $openDT)->modify('-30 minutes');
     $endDT = (clone $closeDT)->modify('+30 minutes');
 
-    $startHour = (int)$startDT->format('G');
-    $endHour = (int)$endDT->format('G');
-    // If closing buffer ends on a partial hour (e.g. 12:30), round up to show the full hour block
-    if ((int)$endDT->format('i') > 0) $endHour++;
+    $configStartHour = (int)$startDT->format('G');
+    $configEndHour = (int)$endDT->format('G');
+    if ((int)$endDT->format('i') > 0) $configEndHour++;
+
+    // 3. Final scaling: Use the broader of either Config or Data
+    $startHour = min($configStartHour, $minDataHour);
+    $endHour   = max($configEndHour, $maxDataHour);
 
     $start = (clone $now)->setTime($startHour, 0);
     $end = (clone $now)->setTime($endHour, 0);
