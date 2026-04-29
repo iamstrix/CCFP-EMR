@@ -8,11 +8,12 @@ ValdesCare is a professional, offline-first clinical management system designed 
 ## 🚀 Key Features
 
 *   **Dynamic Analytics Dashboard**: Real-time tracking of patient volume, demographics, and top diagnoses with interactive Chart.js visualizations.
-*   **Comprehensive Patient Records**: Digital management of patient profiles, household data, and PhilHealth status.
+*   **Full CRUD Implementation**: Complete Create, Read, Update, and Delete capabilities across all modules (Patients, Consultations, and Physicians).
+*   **Interactive Manage Mode**: A unique "Manage" toggle system that switches between a safe "Read-Only" view and an "Edit Mode," preventing accidental data modification.
+*   **Data Integrity (Soft Deletes)**: Advanced soft-delete architecture that preserves historical medical data and foreign key relationships even when records are removed from the UI.
+*   **Auto-Restore Intelligence**: Smart duplicate checking during registration that automatically detects and restores previous medical history for returning patients or physicians.
 *   **Clinical Encounters**: Structured logging of chief complaints, detailed symptoms, diagnoses, and treatments.
-*   **Physician Directory**: Management of attending physicians and health workers.
 *   **Report Generation**: Automated generation of printable patient history and medical summaries.
-*   **Local Network Optimized**: Designed to run seamlessly in a LAN environment using XAMPP.
 
 ---
 
@@ -71,12 +72,13 @@ CREATE TABLE IF NOT EXISTS patient (
     mobile_no               VARCHAR(50)  NOT NULL,
     mothers_maiden_name     VARCHAR(150) NULL DEFAULT NULL,
     relationship_to_head    VARCHAR(50)  NOT NULL,
-    is_ip                   ENUM('Yes','No') NOT NULL DEFAULT 'No' COMMENT 'Indigenous People household',
+    is_ip                   ENUM('Yes','No') NOT NULL DEFAULT 'No',
     nhts_status             ENUM('NHTS','NON-NHTS') NOT NULL DEFAULT 'NON-NHTS',
     is_philhealth_member    ENUM('Yes','No') NOT NULL DEFAULT 'No',
     philhealth_no           VARCHAR(50)  NULL DEFAULT NULL,
     philhealth_category     VARCHAR(100) NULL DEFAULT NULL,
     school_status           ENUM('In-School','Out of School Youth','Not in School') NOT NULL DEFAULT 'Not in School',
+    is_deleted              TINYINT(1) NOT NULL DEFAULT 0,
     created_at              TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at              TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (patient_id)
@@ -104,6 +106,7 @@ CREATE TABLE IF NOT EXISTS physician (
     specialty      VARCHAR(100)          NULL DEFAULT NULL,
     license_no     VARCHAR(30)           NULL DEFAULT NULL,
     is_active      TINYINT(1)        NOT NULL DEFAULT 1,
+    is_deleted     TINYINT(1)        NOT NULL DEFAULT 0,
     PRIMARY KEY (physician_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -117,6 +120,7 @@ CREATE TABLE IF NOT EXISTS consultation (
     treatment           TEXT         NULL DEFAULT NULL,
     remarks             TEXT         NULL DEFAULT NULL,
     physician_id        SMALLINT UNSIGNED NULL DEFAULT NULL,
+    is_deleted          TINYINT(1)   NOT NULL DEFAULT 0,
     created_at          TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at          TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (consultation_id),
@@ -136,7 +140,8 @@ SELECT
     address AS full_address,
     is_ip,
     nhts_status
-FROM patient;
+FROM patient
+WHERE is_deleted = 0;
 
 CREATE OR REPLACE VIEW v_consultation_full AS
 SELECT
@@ -155,14 +160,9 @@ SELECT
     c.treatment
 FROM consultation c
 JOIN patient      p   ON c.patient_id    = p.patient_id
-LEFT JOIN physician   ph  ON c.physician_id  = ph.physician_id;
+LEFT JOIN physician   ph  ON c.physician_id  = ph.physician_id
+WHERE c.is_deleted = 0;
 ```
-
-### 3. Generate Mock Data (Optional)
-If you wish to populate the system with 30 patients and multiple years of visit records for testing:
-1.  Open your browser to `http://localhost/ccs06-appdev/final-test/mock_data_gen.php`.
-2.  This will generate a file named `mock_records.sql`.
-3.  Import `mock_records.sql` into phpMyAdmin using the **Import** tab.
 
 ---
 
@@ -170,11 +170,11 @@ If you wish to populate the system with 30 patients and multiple years of visit 
 ```text
 final-test/
 ├── dashboard/        ← Analytics & Chart.js visualizations
-├── patients/         ← Patient registration & profile management
-├── consultations/    ← Clinical encounter logging (New/List/View)
-├── physicians/       ← Staff directory management
+├── patients/         ← Patient registration & profile management (CRUD)
+├── consultations/    ← Clinical encounter logging (CRUD)
+├── physicians/       ← Staff directory management (CRUD)
 ├── exports/          ← Printable report generation (PDF/HTML)
-├── assets/           ← CSS & JS (Chart.js)
+├── assets/           ← CSS & JS (Chart.js, Toggle Logic)
 ├── includes/         ← Shared UI components (Header/Footer)
 ├── db_connect.php    ← Core database configuration
 └── valdescare_schema.sql
@@ -183,8 +183,8 @@ final-test/
 ---
 
 ## ⚙️ Configuration Notes
+*   **Soft Deletes**: Deleting a record updates the `is_deleted` flag to `1`. Records remain in the database to maintain history but are hidden from the UI.
 *   **Timezone**: The system is pre-configured to `Asia/Manila` (UTC+8) in `db_connect.php`.
-*   **Credentials**: The default database user is `root` with no password. Edit `db_connect.php` if your local MySQL setup differs.
 *   **Security**: Ensure `db_connect.php` is never exposed to public internet as it contains database credentials.
 
 ---
@@ -194,9 +194,9 @@ final-test/
 | Issue | Solution |
 | :--- | :--- |
 | **Database Connection Error** | Ensure MySQL is running in XAMPP and the `valdescare` database exists. |
-| **Charts are missing** | Ensure `assets/js/chart.min.js` exists or run the recovery command in `README.md`. |
-| **Missing CSS/Styles** | Access the system via `http://localhost/` instead of opening files directly. |
-| **Date Errors** | Future dates are blocked by default to maintain data integrity. |
+| **Duplicate Patient/Physician** | The system will automatically detect and offer to **Restore** deleted records for same individuals. |
+| **Charts are missing** | Ensure `assets/js/chart.min.js` exists or run the recovery command. |
+| **Missing Edit/Delete buttons** | Click the **"Manage"** button at the top of the list to enter Edit Mode. |
 
 ---
 
