@@ -8,12 +8,11 @@ ValdesCare is a professional, offline-first clinical management system designed 
 ## 🚀 Key Features
 
 *   **Dynamic Analytics Dashboard**: Real-time tracking of patient volume, demographics, and top diagnoses with interactive Chart.js visualizations.
-*   **Full CRUD Implementation**: Complete Create, Read, Update, and Delete capabilities across all modules (Patients, Consultations, and Physicians).
-*   **Interactive Manage Mode**: A unique "Manage" toggle system that switches between a safe "Read-Only" view and an "Edit Mode," preventing accidental data modification.
-*   **Data Integrity (Soft Deletes)**: Advanced soft-delete architecture that preserves historical medical data and foreign key relationships even when records are removed from the UI.
-*   **Auto-Restore Intelligence**: Smart duplicate checking during registration that automatically detects and restores previous medical history for returning patients or physicians.
+*   **Comprehensive Patient Records**: Digital management of patient profiles, household data, and PhilHealth status.
 *   **Clinical Encounters**: Structured logging of chief complaints, detailed symptoms, diagnoses, and treatments.
+*   **Physician Directory**: Management of attending physicians and health workers.
 *   **Report Generation**: Automated generation of printable patient history and medical summaries.
+*   **Local Network Optimized**: Designed to run seamlessly in a LAN environment using XAMPP.
 
 ---
 
@@ -140,8 +139,7 @@ SELECT
     address AS full_address,
     is_ip,
     nhts_status
-FROM patient
-WHERE is_deleted = 0;
+FROM patient;
 
 CREATE OR REPLACE VIEW v_consultation_full AS
 SELECT
@@ -170,11 +168,11 @@ WHERE c.is_deleted = 0;
 ```text
 final-test/
 ├── dashboard/        ← Analytics & Chart.js visualizations
-├── patients/         ← Patient registration & profile management (CRUD)
-├── consultations/    ← Clinical encounter logging (CRUD)
-├── physicians/       ← Staff directory management (CRUD)
+├── patients/         ← Patient registration & profile management
+├── consultations/    ← Clinical encounter logging (New/List/View)
+├── physicians/       ← Staff directory management
 ├── exports/          ← Printable report generation (PDF/HTML)
-├── assets/           ← CSS & JS (Chart.js, Toggle Logic)
+├── assets/           ← CSS & JS (Chart.js)
 ├── includes/         ← Shared UI components (Header/Footer)
 ├── db_connect.php    ← Core database configuration
 └── valdescare_schema.sql
@@ -183,8 +181,8 @@ final-test/
 ---
 
 ## ⚙️ Configuration Notes
-*   **Soft Deletes**: Deleting a record updates the `is_deleted` flag to `1`. Records remain in the database to maintain history but are hidden from the UI.
 *   **Timezone**: The system is pre-configured to `Asia/Manila` (UTC+8) in `db_connect.php`.
+*   **Credentials**: The default database user is `root` with no password. Edit `db_connect.php` if your local MySQL setup differs.
 *   **Security**: Ensure `db_connect.php` is never exposed to public internet as it contains database credentials.
 
 ---
@@ -194,9 +192,9 @@ final-test/
 | Issue | Solution |
 | :--- | :--- |
 | **Database Connection Error** | Ensure MySQL is running in XAMPP and the `valdescare` database exists. |
-| **Duplicate Patient/Physician** | The system will automatically detect and offer to **Restore** deleted records for same individuals. |
-| **Charts are missing** | Ensure `assets/js/chart.min.js` exists or run the recovery command. |
-| **Missing Edit/Delete buttons** | Click the **"Manage"** button at the top of the list to enter Edit Mode. |
+| **Charts are missing** | Ensure `assets/js/chart.min.js` exists or run the recovery command in `README.md`. |
+| **Missing CSS/Styles** | Access the system via `http://localhost/` instead of opening files directly. |
+| **Date Errors** | Future dates are blocked by default to maintain data integrity. |
 
 ---
 
