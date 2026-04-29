@@ -12,7 +12,7 @@ if (!$id) {
     die("Invalid consultation ID.");
 }
 
-$stmt = $pdo->prepare("DELETE FROM consultation WHERE consultation_id = ?");
+$stmt = $pdo->prepare("UPDATE consultation SET is_deleted = 1 WHERE consultation_id = ?");
 $stmt->execute([$id]);
 
 header("Location: list.php?msg=deleted");

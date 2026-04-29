@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     header('Location: manage.php'); exit;
 }
 
-$physicians = $pdo->query("SELECT * FROM physician ORDER BY last_name, first_name")->fetchAll();
+$physicians = $pdo->query("SELECT * FROM physician WHERE is_deleted = 0 ORDER BY last_name, first_name")->fetchAll();
 
 require_once ROOT . '/includes/header.php';
 ?>

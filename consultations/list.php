@@ -13,7 +13,7 @@ $dateFrom= trim($_GET['date_from']?? '');
 $dateTo  = trim($_GET['date_to'] ?? '');
 
 $params = [];
-$where  = ['1=1'];
+$where  = ['c.is_deleted = 0'];
 
 if ($search) {
     $like = "%$search%";

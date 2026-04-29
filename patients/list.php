@@ -14,7 +14,7 @@ $ip     = $_GET['is_ip'] ?? '';
 $nhts   = $_GET['nhts_status'] ?? '';
 
 $params = [];
-$where  = ['1=1'];
+$where  = ['p.is_deleted = 0'];
 
 if ($search) {
     $where[]  = "(p.patient_name LIKE ? OR p.philhealth_no LIKE ?)";

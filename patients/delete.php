@@ -12,7 +12,7 @@ if (!$id) {
     die("Invalid patient ID.");
 }
 
-$stmt = $pdo->prepare("DELETE FROM patient WHERE patient_id = ?");
+$stmt = $pdo->prepare("UPDATE patient SET is_deleted = 1 WHERE patient_id = ?");
 $stmt->execute([$id]);
 
 header("Location: list.php?msg=deleted");
