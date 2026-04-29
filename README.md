@@ -9,6 +9,7 @@ ValdesCare is a professional, offline-first clinical management system designed 
 
 *   **Dynamic Analytics Dashboard**: Real-time tracking of patient volume, demographics, and top diagnoses with interactive Chart.js visualizations.
 *   **Comprehensive Patient Records**: Digital management of patient profiles, household data, and PhilHealth status.
+*   **Configurable Clinic Hours**: System-wide settings to define operating hours, which automatically scales the dashboard's "Today" visualization with a professional buffer.
 *   **Clinical Encounters**: Structured logging of chief complaints, detailed symptoms, diagnoses, and treatments.
 *   **Physician Directory**: Management of attending physicians and health workers.
 *   **Report Generation**: Automated generation of printable patient history and medical summaries.
