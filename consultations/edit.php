@@ -138,34 +138,18 @@ require_once ROOT . '/includes/header.php';
       <!-- ── SECTION: CLINICAL ── -->
       <div class="form-section">Clinical Assessment</div>
 
-      <div class="form-group" style="grid-column: span 2;">
-        <label for="chief_complaint">Chief Complaint *</label>
-        <input type="text" name="chief_complaint" id="chief_complaint" list="complaint_tags" required
-               placeholder="e.g. Fever, Cough, Headache" value="<?= htmlspecialchars($formData['chief_complaint'] ?? '') ?>">
-        <datalist id="complaint_tags">
-          <option value="Fever">
-          <option value="Cough">
-          <option value="Headache">
-          <option value="Stomach ache">
-          <option value="Body pain">
-          <option value="Dizziness">
-          <option value="Skin Rash">
-        </datalist>
+            <div class="form-group" style="grid-column: span 2;">
+          <label for="chief_complaint" class="form-label">Chief Complaint</label>
+          <div class="autocomplete-wrapper">
+            <input type="text" name="chief_complaint" id="chief_complaint" class="form-control" value="<?= htmlspecialchars($formData['chief_complaint'] ?? '') ?>" autocomplete="off" required>
+          </div>
       </div>
 
       <div class="form-group" style="grid-column: span 2;">
-        <label for="diagnosis">Initial Diagnosis *</label>
-        <input type="text" name="diagnosis" id="diagnosis" list="diagnosis_tags" required
-               placeholder="e.g. Acute Respiratory Infection, Hypertension" value="<?= htmlspecialchars($formData['diagnosis'] ?? '') ?>">
-        <datalist id="diagnosis_tags">
-          <option value="Acute Respiratory Infection">
-          <option value="Hypertension">
-          <option value="Common Cold">
-          <option value="Acid Reflux (GERD)">
-          <option value="Skin Infection (Tinea)">
-          <option value="Type 2 Diabetes">
-          <option value="Allergic Rhinitis">
-        </datalist>
+          <label for="diagnosis" class="form-label">Diagnosis</label>
+          <div class="autocomplete-wrapper">
+            <input type="text" name="diagnosis" id="diagnosis" class="form-control" value="<?= htmlspecialchars($formData['diagnosis'] ?? '') ?>" autocomplete="off" required>
+          </div>
       </div>
 
       <div class="form-group" style="grid-column: span 2;">
@@ -194,5 +178,6 @@ require_once ROOT . '/includes/header.php';
     </div>
   </div>
 </form>
+<script src="../assets/js/init_autocomplete.js"></script>
 
 <?php require_once ROOT . '/includes/footer.php'; ?>
