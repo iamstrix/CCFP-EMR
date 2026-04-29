@@ -450,8 +450,24 @@ tbody tr:nth-child(even):hover {
   display: none !important;
 }
 
-.card:not(.edit-mode-active) .edit-mode-only {
+.edit-mode-only {
   display: none !important;
+}
+
+.edit-mode-active .edit-mode-only {
+  display: inline-flex !important;
+}
+
+/* Ensure block elements like cards also display correctly when toggled */
+div.edit-mode-only.edit-mode-active,
+div.edit-mode-active .edit-mode-only {
+    display: block !important;
+}
+
+/* Reset for buttons to keep their flex alignment */
+.btn.edit-mode-only.edit-mode-active,
+.edit-mode-active .btn.edit-mode-only {
+    display: inline-flex !important;
 }
 
 .btn-toggle-edit {
