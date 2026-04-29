@@ -431,6 +431,20 @@ tbody tr:nth-child(even):hover {
   font-size: .8rem;
 }
 
+.btn-icon {
+  padding: .35rem;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
 /* ── Forms ── */
 .form-grid {
   display: grid;
