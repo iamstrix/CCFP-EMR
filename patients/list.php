@@ -107,7 +107,13 @@ require_once ROOT . '/includes/header.php';
 <div class="card">
   <div class="card-title" style="justify-content:space-between; display:flex; align-items:center; flex-wrap:wrap; gap:.5rem;">
     <span>Patients <span style="font-weight:400;color:var(--clr-text-muted);font-size:.85rem;">(<?= count($patients) ?> found)</span></span>
-    <a href="register.php" class="btn btn-primary btn-sm">Register New</a>
+    <div style="display:flex; gap:.5rem; align-items:center;">
+      <button type="button" class="btn btn-sm btn-outline btn-toggle-edit" id="toggleEditMode">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin-right:2px;"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+        Manage
+      </button>
+      <a href="register.php" class="btn btn-primary btn-sm read-mode-only">Register New</a>
+    </div>
   </div>
 
   <?php if (empty($patients)): ?>
@@ -152,12 +158,12 @@ require_once ROOT . '/includes/header.php';
           </td>
           <td style="text-align:center;"><?= $p['visit_count'] ?></td>
           <td style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
-            <a href="view.php?id=<?= $p['patient_id'] ?>" class="btn btn-sm btn-outline">View</a>
-            <a href="../consultations/new.php?patient_id=<?= $p['patient_id'] ?>" class="btn btn-sm btn-primary">+ Consult</a>
-            <a href="edit.php?id=<?= $p['patient_id'] ?>" class="btn btn-outline btn-icon" title="Edit Patient">
+            <a href="view.php?id=<?= $p['patient_id'] ?>" class="btn btn-sm btn-outline read-mode-only">View</a>
+            <a href="../consultations/new.php?patient_id=<?= $p['patient_id'] ?>" class="btn btn-sm btn-primary read-mode-only">+ Consult</a>
+            <a href="edit.php?id=<?= $p['patient_id'] ?>" class="btn btn-outline btn-icon edit-mode-only" title="Edit Patient">
               <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
             </a>
-            <a href="delete.php?id=<?= $p['patient_id'] ?>" class="btn btn-danger btn-icon" title="Delete Patient" onclick="return confirm('Are you sure you want to delete this patient?');">
+            <a href="delete.php?id=<?= $p['patient_id'] ?>" class="btn btn-danger btn-icon edit-mode-only" title="Delete Patient" onclick="return confirm('Are you sure you want to delete this patient?');">
               <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
             </a>
           </td>
@@ -166,7 +172,21 @@ require_once ROOT . '/includes/header.php';
       </tbody>
     </table>
   </div>
-  <?php endif; ?>
+<?php endif; ?>
 </div>
+
+<script>
+document.getElementById('toggleEditMode').addEventListener('click', function() {
+    const card = this.closest('.card');
+    card.classList.toggle('edit-mode-active');
+    
+    // Optional: Change text based on state
+    if (card.classList.contains('edit-mode-active')) {
+        this.innerHTML = '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin-right:2px;"><path d="M6 18L18 6M6 6l12 12"></path></svg> Exit Edit';
+    } else {
+        this.innerHTML = '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin-right:2px;"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg> Manage';
+    }
+});
+</script>
 
 <?php require_once ROOT . '/includes/footer.php'; ?>

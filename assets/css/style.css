@@ -445,6 +445,25 @@ tbody tr:nth-child(even):hover {
   height: 16px;
 }
 
+/* ── CRUD Toggle Mode Utilities ── */
+.edit-mode-active .read-mode-only {
+  display: none !important;
+}
+
+.card:not(.edit-mode-active) .edit-mode-only {
+  display: none !important;
+}
+
+.btn-toggle-edit {
+  transition: all var(--trans);
+}
+
+.edit-mode-active .btn-toggle-edit {
+  background: var(--clr-accent) !important;
+  color: #fff !important;
+  border-color: var(--clr-accent) !important;
+}
+
 /* ── Forms ── */
 .form-grid {
   display: grid;
