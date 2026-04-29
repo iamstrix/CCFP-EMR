@@ -10,6 +10,7 @@ ValdesCare is a professional, offline-first clinical management system designed 
 *   **Dynamic Analytics Dashboard**: Real-time tracking of patient volume, demographics, and top diagnoses with interactive Chart.js visualizations.
 *   **Full CRUD Implementation**: Complete Create, Read, Update, and Delete capabilities across all modules (Patients, Consultations, and Physicians).
 *   **Interactive Manage Mode**: A unique "Manage" toggle system that switches between a safe "Read-Only" view and an "Edit Mode," preventing accidental data modification.
+*   **Configurable Clinic Hours**: System-wide settings to define operating hours, which automatically scales the dashboard's "Today" visualization with a professional buffer.
 *   **Data Integrity (Soft Deletes)**: Advanced soft-delete architecture that preserves historical medical data and foreign key relationships even when records are removed from the UI.
 *   **Auto-Restore Intelligence**: Smart duplicate checking during registration that automatically detects and restores previous medical history for returning patients or physicians.
 *   **Clinical Encounters**: Structured logging of chief complaints, detailed symptoms, diagnoses, and treatments.

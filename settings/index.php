@@ -54,7 +54,7 @@ require_once ROOT . '/includes/header.php';
 <form method="POST" action="">
   <div class="card" style="max-width: 600px;">
     <div class="card-title">Clinic Operating Hours</div>
-    <p class="text-muted" style="margin-bottom: 1.5rem;">These hours define the temporal scaling on the analytics dashboard (Today filter) with a 30-minute buffer.</p>
+    <p class="text-muted" style="margin-bottom: 1.5rem;">These hours determine the time range displayed on the analytics dashboard (Today filter). The system automatically adds a 30-minute buffer before opening and after closing to ensure all visits are visible.</p>
     
     <div class="form-grid" style="grid-template-columns: 1fr 1fr;">
       <div class="form-group">
