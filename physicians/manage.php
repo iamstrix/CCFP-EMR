@@ -22,9 +22,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     if (!$last)  $errors[] = 'Last name required.';
 
     if (empty($errors)) {
-        $stmt = $pdo->prepare("INSERT INTO physician (first_name,last_name,specialty,license_no) VALUES(?,?,?,?)");
-        $stmt->execute([$first,$last,$spec,$license]);
-        $success = "Dr. $last, $first added successfully.";
+        // Check for existing physician (including deleted ones) to prevent duplicates and "ghost" records
+        $check = $pdo->prepare("SELECT physician_id, is_deleted FROM physician WHERE first_name = ? AND last_name = ?");
+        $check->execute([$first, $last]);
+        $existing = $check->fetch();
+
+        if ($existing) {
+            if ($existing['is_deleted']) {
+                // Restore the old record instead of creating a new ID
+                $stmt = $pdo->prepare("UPDATE physician SET is_deleted = 0, specialty = ?, license_no = ?, is_active = 1 WHERE physician_id = ?");
+                $stmt->execute([$spec, $license, $existing['physician_id']]);
+                $success = "Dr. $last, $first was previously in the system and has been restored.";
+            } else {
+                $errors[] = "A physician with the name Dr. $last, $first already exists in the directory.";
+            }
+        } else {
+            $stmt = $pdo->prepare("INSERT INTO physician (first_name,last_name,specialty,license_no) VALUES(?,?,?,?)");
+            $stmt->execute([$first, $last, $spec, $license]);
+            $success = "Dr. $last, $first added successfully.";
+        }
     }
 }
 

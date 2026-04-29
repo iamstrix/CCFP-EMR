@@ -45,17 +45,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (empty($errors)) {
-        $stmt = $pdo->prepare(
-            "INSERT INTO patient
-               (household_no, patient_name, dob, age_group, sex, address, mobile_no, mothers_maiden_name, relationship_to_head, is_ip, nhts_status, is_philhealth_member, philhealth_no, philhealth_category, school_status)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-        );
-        $stmt->execute([
-            $householdNo, $patientName, $dob, $ageGroup, $sex, $address, $mobileNo, $mothersMaidenName, $relationship, $isIp, $nhtsStatus, $isPhilhealth, $philhealthNo, $philhealthCat, $schoolStatus
-        ]);
-        $newId = $pdo->lastInsertId();
-        $success = "Patient registered successfully! ID: <strong>#$newId</strong> &mdash; <a href='view.php?id=$newId'>View record</a>.";
-        $formData = []; // clear form
+        // Check for existing patient (including deleted ones) to prevent duplicates and data fragmentation
+        $check = $pdo->prepare("SELECT patient_id, is_deleted FROM patient WHERE patient_name = ? AND dob = ?");
+        $check->execute([$patientName, $dob]);
+        $existing = $check->fetch();
+
+        if ($existing) {
+            if ($existing['is_deleted']) {
+                // Restore the old record instead of creating a new ID
+                $stmt = $pdo->prepare(
+                    "UPDATE patient SET 
+                       is_deleted = 0, household_no = ?, age_group = ?, sex = ?, address = ?, mobile_no = ?, 
+                       mothers_maiden_name = ?, relationship_to_head = ?, is_ip = ?, nhts_status = ?, 
+                       is_philhealth_member = ?, philhealth_no = ?, philhealth_category = ?, school_status = ?
+                     WHERE patient_id = ?"
+                );
+                $stmt->execute([
+                    $householdNo, $ageGroup, $sex, $address, $mobileNo, 
+                    $mothersMaidenName, $relationship, $isIp, $nhtsStatus, 
+                    $isPhilhealth, $philhealthNo, $philhealthCat, $schoolStatus, $existing['patient_id']
+                ]);
+                $newId = $existing['patient_id'];
+                $success = "Patient <strong>#$newId</strong> was previously in the system and has been restored with the provided information. <a href='view.php?id=$newId'>View record</a>.";
+            } else {
+                $errors[] = "A patient with the name '$patientName' and same Date of Birth already exists (ID: #".$existing['patient_id'].").";
+            }
+        } else {
+            $stmt = $pdo->prepare(
+                "INSERT INTO patient
+                   (household_no, patient_name, dob, age_group, sex, address, mobile_no, mothers_maiden_name, relationship_to_head, is_ip, nhts_status, is_philhealth_member, philhealth_no, philhealth_category, school_status)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+            );
+            $stmt->execute([
+                $householdNo, $patientName, $dob, $ageGroup, $sex, $address, $mobileNo, $mothersMaidenName, $relationship, $isIp, $nhtsStatus, $isPhilhealth, $philhealthNo, $philhealthCat, $schoolStatus
+            ]);
+            $newId = $pdo->lastInsertId();
+            $success = "Patient registered successfully! ID: <strong>#$newId</strong> &mdash; <a href='view.php?id=$newId'>View record</a>.";
+        }
+
+        if (empty($errors)) {
+            $formData = []; // clear form
+        }
     }
 }
 
